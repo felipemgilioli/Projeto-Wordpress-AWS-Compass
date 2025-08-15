@@ -29,7 +29,7 @@ Essa arquitetura simula um ambiente de produção real, no qual interrupções n
 
 A imagem abaixo ilustra a arquitetura implementada, demonstrando como os serviços da AWS interagem para criar uma solução robusta.
 
-![Figura 01: Diagrama Wordpress]([LINK_PARA_A_IMAGEM_DO_DIAGRAMA_AQUI.png](https://github.com/felipemgilioli/Projeto-Wordpress-AWS-Compass/blob/main/images/Arquitetura-Projeto.png))
+![Figura 01: Diagrama Wordpress](https://github.com/felipemgilioli/Projeto-Wordpress-AWS-Compass/blob/main/images/Arquitetura-Projeto.png)
 
 
 A aplicação WordPress será distribuída em instâncias **EC2** por meio de um **Auto Scaling Group (ASG)**, com balanceamento de carga fornecido por um **Application Load Balancer (ALB)**. O armazenamento de arquivos (uploads, mídias) será centralizado e compartilhado através do **Amazon Elastic File System (EFS)**, enquanto os dados da aplicação serão armazenados com o **Amazon RDS**.
