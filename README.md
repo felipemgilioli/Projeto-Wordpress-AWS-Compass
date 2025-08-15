@@ -1,5 +1,4 @@
 # Projeto-Wordpress-AWS-Compass
-# WordPress em Alta Disponibilidade na AWS
 
 *Projeto de infraestrutura para hospedar uma aplicação WordPress escalável, resiliente e tolerante a falhas, utilizando os principais serviços gerenciados da nuvem AWS.*
 
@@ -19,9 +18,9 @@
 
 ## 🎯 Sobre o Projeto
 
-Este projeto tem como objetivo desenvolver competências práticas em **infraestrutura como código, provisionamento de recursos em nuvem e arquiteturas resilientes**. A meta é implantar a plataforma WordPress na nuvem AWS de forma escalável e tolerante a falhas, garantindo máximo desempenho e disponibilidade.
+O projeto tem como objetivo aprimorar habilidades práticas em infraestrutura como código, provisionamento de recursos na nuvem e arquiteturas resilientes. A proposta é implantar a plataforma WordPress na AWS de forma escalável e tolerante a falhas, assegurando alto desempenho e disponibilidade contínua.
 
-Essa arquitetura simula um ambiente de produção real, no qual interrupções não podem causar indisponibilidade da aplicação. O uso de serviços gerenciados permite focar na lógica de implementação e escalabilidade, sem a necessidade de gerenciar manualmente servidores de banco de dados ou sistemas de arquivos distribuídos.
+A arquitetura proposta simula um ambiente, no qual interrupções não podem causar indisponibilidade da aplicação, através da utilização de serviços gerenciados da AWS, garantindo desempenho resiliência e manutenção facilitada. 
 
 ---
 
@@ -54,7 +53,7 @@ A solução é composta pelos seguintes recursos provisionados e configurados na
 * Utilizado para armazenar de forma centralizada os arquivos enviados ao WordPress (fotos, vídeos, etc.).
 
 #### Auto Scaling Group com EC2
-* **Script de bootstrap (`user-data`)** para automação da configuração inicial das instâncias.
+* **Script de bootstrap ([user-data](https://github.com/felipemgilioli/Projeto-Wordpress-AWS-Compass/blob/main/user-data.sh))** para automação da configuração inicial das instâncias.
 * **Escalonamento automático** baseado no uso de CPU para lidar com variações de tráfego.
 
 #### Application Load Balancer
@@ -69,25 +68,49 @@ O projeto foi construído seguindo as etapas abaixo:
 
 1.  **Análise Local:** Rodar o WordPress via Docker para conhecer a aplicação base.
 2.  **Criar a VPC:**
-    * 2 Availability Zones (AZs).
-    * 4 subnets (2 públicas, 2 privadas).
+    * 2 (AZs).
+    * 4 subnets (2 públicas, 4 privadas).
     * IGW para acesso à internet nas subnets públicas.
     * NAT Gateway para permitir que recursos em subnets privadas acessem a internet.
-3.  **Criar o RDS:**
+3.  **Criar os Security Groups**
+
+| Security Group      | Entrada                                  | Saída                                               |
+|---------------------|------------------------------------------|-----------------------------------------------------|
+| Security-Group-ALB  | HTTP (Qualquer)                          | HTTP (SecurityGroup-EC2)                            |
+| Security-Group-EC2  | HTTP (SG-ALB), MySQL (Security-Group-RDS) | Todo tráfego (Qualquer), MySQL (Qualquer), HTTP (Qualquer), NFS (Qualquer) |
+| Security-Group-RDS  | HTTP (Qualquer)                          | HTTP (SecurityGroup-EC2)                            |
+| Security-Group-NF   | NFS (Security-Group-EC2)                  | NFS (Security-Group-EC2)                            |
+
+4.  **Criar o RDS:**
     * Provisionar o banco de dados MySQL/MariaDB.
     * Configurar o Security Group para permitir acesso apenas das instâncias EC2.
-4.  **Criar o EFS:**
+5.  **Criar o EFS:**
     * Provisionar o sistema de arquivos NFS.
     * Configurar as permissões no Security Group para montagem nas instâncias EC2.
-5.  **Criar o Launch Template:**
+6.  **Criar o Launch Template:**
     * Definir um modelo de lançamento para as instâncias EC2.
-    * Incluir um script `user-data` que instala o WordPress, monta o EFS e configura a conexão com o banco de dados na inicialização.
-6.  **Criar o Auto Scaling Group:**
+    * Incluir o script [user-data](https://github.com/felipemgilioli/Projeto-Wordpress-AWS-Compass/blob/main/user-data.sh) que instala o WordPress, monta o EFS e configura a conexão com o banco de dados na inicialização.
+7.  **Criar o Auto Scaling Group:**
     * Associar ao Launch Template criado.
     * Configurar para operar nas subnets privadas.
-7.  **Criar o Application Load Balancer:**
+8.  **Criar o Application Load Balancer:**
     * Associar às subnets públicas.
     * Configurar para encaminhar o tráfego para o Auto Scaling Group.
 
+As imagens registrando algumas etapas podem ser acessadas em: [Imagens](https://github.com/felipemgilioli/Projeto-Wordpress-AWS-Compass/tree/main/images)
+
+---
+## ⚠️ Observações!
+
+Se você estiver replicando este projeto, especialmente em contas AWS de estudo, fique atento aos seguintes pontos:
+
+* **Contas de estudo têm recursos limitados. Lembre-se de **excluir TODOS os recursos** após finalizar os estudos**.
+* **Monitore os custos diariamente no AWS Cost Explorer**.
+* **Contas AWS de estudo possuem restrições:**
+  - Instâncias EC2 podem exigir tags obrigatórias.
+    
 ---
 
+## 👨‍💻 Autor
+
+Projeto desenvolvido por **Felipe Moneda**.
